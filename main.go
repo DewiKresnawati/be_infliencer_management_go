@@ -1,17 +1,16 @@
-package main
+package handler
 
 import (
 	"influencer-golang/config"
 	"influencer-golang/routes"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-// Handler utama yang akan dikenali oleh Vercel
+// Handler utama yang dikenali oleh Vercel
 func Handler(w http.ResponseWriter, r *http.Request) {
 	// Connect to the Database
 	if err := config.ConnectDB(); err != nil {
@@ -27,7 +26,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	rg := gin.Default()
 
 	rg.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // Ubah jika perlu batasan
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
@@ -38,18 +37,4 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	// Jalankan server sebagai handler
 	rg.ServeHTTP(w, r)
-}
-
-// Fungsi `main()` tetap ada untuk testing secara lokal
-func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	log.Printf("🚀 Server berjalan di port %s", port)
-	http.HandleFunc("/", Handler)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatalf("❌ Gagal menjalankan server: %v", err)
-	}
 }
